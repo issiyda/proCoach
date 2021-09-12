@@ -1,56 +1,54 @@
-import React, { FC } from "react"
-import styled, { css } from "styled-components"
-import Link from "next/link"
+import React, { FC } from 'react';
+import styled, { css } from 'styled-components';
+import Link from 'next/link';
 
 // Atom
-import { BEFORE_LINK } from "@/constants/link"
-import useAuth from "@/contexts/auth"
+import { BEFORE_LINK } from '@/constants/link';
+import useAuth from '@/contexts/auth';
 
 // Constants
-import { headerWords } from "@/constants/words/header"
+import { headerWords } from '@/constants/words/header';
 
 // メディアクエリ用
-import { sp } from "@/media"
+import { sp } from '@/media';
 
 type backgroundProps = {
-  black?: boolean
-  white?: boolean
-  accent?: boolean
-}
+  black?: boolean;
+  white?: boolean;
+  accent?: boolean;
+};
 
 export const Header: FC = () => {
-  const { isAuthenticated, user, logout } = useAuth()
+  const { user, logout } = useAuth();
 
   const handleClickLogout = async () => {
-    await logout()
-  }
+    await logout();
+  };
 
   return (
     <HeaderContainer black>
-      {isAuthenticated && (
-        <Nav>
-          <Logo>logo</Logo>
-          <ButtonContainer>
-            {user.id !== undefined ? (
-              <NavLink accent onClick={() => handleClickLogout()}>
-                {headerWords.logout}
-              </NavLink>
-            ) : (
-              <>
-                <Link href={BEFORE_LINK.LOGIN}>
-                  <NavLink white>{headerWords.login}</NavLink>
-                </Link>
-                <Link href={BEFORE_LINK.REGISTER}>
-                  <NavLink accent>{headerWords.register}</NavLink>
-                </Link>
-              </>
-            )}
-          </ButtonContainer>
-        </Nav>
-      )}
+      <Nav>
+        <Logo>logo</Logo>
+        <ButtonContainer>
+          {user.id !== undefined ? (
+            <NavLink accent onClick={() => handleClickLogout()}>
+              {headerWords.logout}
+            </NavLink>
+          ) : (
+            <>
+              <Link href={BEFORE_LINK.LOGIN}>
+                <NavLink white>{headerWords.login}</NavLink>
+              </Link>
+              <Link href={BEFORE_LINK.REGISTER}>
+                <NavLink accent>{headerWords.register}</NavLink>
+              </Link>
+            </>
+          )}
+        </ButtonContainer>
+      </Nav>
     </HeaderContainer>
-  )
-}
+  );
+};
 
 const HeaderContainer = styled.div<backgroundProps>`
   background: black;
@@ -67,8 +65,8 @@ const HeaderContainer = styled.div<backgroundProps>`
       ? css`
           background: black;
         `
-      : ""};
-`
+      : ''};
+`;
 
 const Nav = styled.ul`
   margin: 0 auto;
@@ -78,15 +76,15 @@ const Nav = styled.ul`
   justify-content: flex-end;
   align-items: center;
   justify-content: space-between;
-`
+`;
 
 const Logo = styled.div`
   color: white;
-`
+`;
 
 const ButtonContainer = styled.div`
   display: flex;
-`
+`;
 
 const NavLink = styled.li<backgroundProps>`
 width
@@ -116,12 +114,12 @@ width
       ? css`
           background: #fff;
         `
-      : ""};
+      : ''};
   ${({ accent }) =>
     accent
       ? css`
           color: #fff;
           background: #be5b55;
         `
-      : ""};
-`
+      : ''};
+`;
