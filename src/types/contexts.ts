@@ -9,7 +9,6 @@ import {
 } from '@/types/api';
 
 export interface AuthType {
-  isAuthenticated: boolean;
   user: User;
   login: (requestData: RequestLogin) => Promise<void>;
   logout: () => Promise<void>;
