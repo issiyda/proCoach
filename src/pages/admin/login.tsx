@@ -53,7 +53,7 @@ const Login = () => {
             <Input
               type="password"
               name="password"
-              placeholder="proCoarch@gmail.com"
+              placeholder="test@gmail.com"
               onChange={(e) => handleChange(e)}
               outline=""
             />

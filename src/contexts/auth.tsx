@@ -25,8 +25,8 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
   const login = async (loginData: RequestLogin): Promise<void> => {
     try {
-      await firebaseAuth(loginData.email, loginData.password);
-      router.push('/admin');
+      const res = await firebaseAuth(loginData.email, loginData.password);
+      console.log(res);
     } catch (error) {
       alert(error);
     }

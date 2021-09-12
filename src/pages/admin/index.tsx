@@ -1,45 +1,65 @@
 import { AuthContext } from '@/utils/context';
-import { getUserEmail } from '@/utils/firebase';
+import { getUserEmail, writeTwitterUser } from '@/utils/firebase';
 import { Input, Button, Center } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import router from 'next/router';
 import { useContext, useEffect, useState } from 'react';
 
+const initialState = {
+  name: '',
+  twitterId: '',
+};
+
 const Admin = () => {
   const [auth, setAuth] = useState(false);
-  const [twitterId, setTwitterId] = useState('');
+  const [twitter, setTwitter] = useState(initialState);
 
-  useEffect(() => {
-    console.log(getUserEmail);
-    getUserEmail === undefined ? router.push('/admin/login') : setAuth(true);
-  }, []);
+  // useEffect(() => {
+  //   console.log('getUserEmail', getUserEmail);
+  //   getUserEmail === undefined ? router.push('/admin/login') : setAuth(true);
+  // }, []);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTwitterId(event.target.value);
+    console.log(event.target.name, event.target.value);
+    setTwitter({
+      ...twitter,
+      [event.target.name]: event.target.value,
+    });
+    console.log(twitter);
   };
 
   const { logout } = useContext(AuthContext);
 
-  const submitId = () => {
-    // firebaseに送信する処理
+  const handleSubmit = () => {
+    console.log('twitter', twitter);
+    writeTwitterUser(twitter);
   };
 
   return (
-    auth && (
-      <AdminContainer>
-        <button onClick={logout}>ログアウト</button>
-        <InputLabel htmlFor="twitterId">ツイッターID</InputLabel>
-        <Input
-          id="twitterId"
-          type="text"
-          placeholder="ツイッターID"
-          onChange={(e) => handleChange(e)}
-        />
-        <Center m={8}>
-          <Button onClick={submitId}>登録</Button>
-        </Center>
-      </AdminContainer>
-    )
+    // auth && (
+    <AdminContainer>
+      <button onClick={logout}>ログアウト</button>
+      <InputLabel htmlFor="name">名前</InputLabel>
+      <Input
+        id="name"
+        name="name"
+        type="text"
+        placeholder="石田さん"
+        onChange={(e) => handleChange(e)}
+      />
+      <InputLabel htmlFor="twitterId">ツイッターID</InputLabel>
+      <Input
+        id="twitterId"
+        name="twitterId"
+        type="text"
+        placeholder="ツイッターID"
+        onChange={(e) => handleChange(e)}
+      />
+      <Center m={8}>
+        <Button onClick={handleSubmit}>登録</Button>
+      </Center>
+    </AdminContainer>
+    // )
   );
 };
 
