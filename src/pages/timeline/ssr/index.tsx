@@ -2,36 +2,41 @@ import TwitterTimeline from '@/components/atoms/twitterTimeline';
 import { TwitterUser } from '@/types/firebase';
 import { getTwitterUser } from '@/utils/firebase';
 import styled from '@emotion/styled';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 
-let isLoadWidgets = false;
+let isLoad = false;
 
-const Timeline = () => {
-  const initialState: TwitterUser[] = [];
+export async function getServerSideProps() {
+  const twitterUsers: TwitterUser[] = [];
+  (await getTwitterUser()).forEach((doc: any) => {
+    twitterUsers.push(doc.data());
+  });
+  console.log(twitterUsers);
 
-  const [users, setUsers] = useState(initialState);
+  return { props: { twitterUsers } };
+}
+
+interface Props {
+  twitterUsers: TwitterUser[];
+}
+
+const Timeline = (props: Props) => {
+  console.log('props', props);
+
   useEffect(() => {
-    if (!isLoadWidgets) {
+    if (!isLoad) {
       const script = document.createElement('script');
       script.setAttribute('src', 'https://platform.twitter.com/widgets.js');
       document.body.appendChild(script);
-      isLoadWidgets = true;
+      isLoad = true;
     }
-    const getTwitterData = async () => {
-      const twitterUsers: TwitterUser[] = [];
-      (await getTwitterUser()).forEach((doc: any) => {
-        twitterUsers.push(doc.data());
-      });
-      return setUsers(twitterUsers);
-    };
-    getTwitterData();
-    console.log(users);
   }, []);
+
   return (
-    users.length > 0 && (
+    props.twitterUsers.length > 0 && (
       <TimelineContainer>
         <TimelineRow>
-          {users.map((user) => {
+          {props.twitterUsers.map((user) => {
             return (
               <TwitterTimelineContainer key={user.twitterId}>
                 <p>{user.name}</p>
