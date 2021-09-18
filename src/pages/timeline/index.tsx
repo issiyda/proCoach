@@ -1,42 +1,41 @@
 import TwitterTimeline from '@/components/atoms/twitterTimeline';
-import { TwitterUser } from '@/types/firebase';
-import { getTwitterUser } from '@/utils/firebase';
+import { TwitterUser, Image } from '@/types/firebase';
+import { getFireStoreData, getStorageData } from '@/utils/firebase';
 import styled from '@emotion/styled';
 import React, { useEffect, useState } from 'react';
 
-let isLoadWidgets = false;
-
 const Timeline = () => {
-  const initialState: TwitterUser[] = [];
+  const initialState: Image[] = [];
 
-  const [users, setUsers] = useState(initialState);
+  const [images, setImages] = useState(initialState);
+  const [storage, setStorage] = useState('');
   useEffect(() => {
-    if (!isLoadWidgets) {
-      const script = document.createElement('script');
-      script.setAttribute('src', 'https://platform.twitter.com/widgets.js');
-      document.body.appendChild(script);
-      isLoadWidgets = true;
-    }
-    const getTwitterData = async () => {
-      const twitterUsers: TwitterUser[] = [];
-      (await getTwitterUser()).forEach((doc: any) => {
-        twitterUsers.push(doc.data());
+    const getImageData = async () => {
+      const images: Image[] = [];
+      (await getFireStoreData('image')).forEach((doc: any) => {
+        images.push(doc.data());
       });
-      return setUsers(twitterUsers);
+      return setImages(images);
     };
-    getTwitterData();
-    console.log(users);
+    getImageData();
+    const getStorage = async () => {
+      const storage = await getStorageData('gs://procoarch.appspot.com');
+      console.log('storage', storage);
+      return setStorage(storage);
+    };
+    getStorage();
   }, []);
+
   return (
-    users.length > 0 && (
+    images.length > 0 && (
       <TimelineContainer>
         <TimelineRow>
-          {users.map((user) => {
+          {images.map((image, index) => {
             return (
-              <TwitterTimelineContainer key={user.twitterId}>
-                <p>{user.name}</p>
-                <TwitterTimeline userName={user.twitterId}></TwitterTimeline>
-              </TwitterTimelineContainer>
+              <ImageContainer key={index}>
+                <p>{image.name}</p>
+                <img src={storage}></img>
+              </ImageContainer>
             );
           })}
         </TimelineRow>
@@ -51,10 +50,12 @@ const TimelineContainer = styled.div`
 
 const TimelineRow = styled.div`
   display: flex;
+  flex-wrap: wrap;
 `;
 
-const TwitterTimelineContainer = styled.div`
+const ImageContainer = styled.div`
   padding: 16px;
+  width: 400px;
 `;
 
 export default Timeline;
