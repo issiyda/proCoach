@@ -20,7 +20,6 @@ const Admin = () => {
   // }, []);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(event.target.name, event.target.value);
     setTwitter({
       ...twitter,
       [event.target.name]: event.target.value,

@@ -1,47 +1,35 @@
 import TwitterTimeline from '@/components/atoms/twitterTimeline';
-import { TwitterUser } from '@/types/firebase';
-import { getTwitterUser } from '@/utils/firebase';
+import { TwitterUser, Image } from '@/types/firebase';
+import { getFireStoreData, getStorageData } from '@/utils/firebase';
 import styled from '@emotion/styled';
-import React, { useEffect } from 'react';
-
-let isLoad = false;
+import React, { useEffect, useState } from 'react';
 
 export async function getServerSideProps() {
-  const twitterUsers: TwitterUser[] = [];
-  (await getTwitterUser()).forEach((doc: any) => {
-    twitterUsers.push(doc.data());
+  const images: Image[] = [];
+  (await getFireStoreData('image')).forEach((doc: any) => {
+    images.push(doc.data());
   });
-  console.log(twitterUsers);
 
-  return { props: { twitterUsers } };
+  const storage = await getStorageData('gs://procoarch.appspot.com');
+  return { props: { images, storage } };
 }
 
 interface Props {
-  twitterUsers: TwitterUser[];
+  images: Image[];
+  storage: string;
 }
 
 const Timeline = (props: Props) => {
-  console.log('props', props);
-
-  useEffect(() => {
-    if (!isLoad) {
-      const script = document.createElement('script');
-      script.setAttribute('src', 'https://platform.twitter.com/widgets.js');
-      document.body.appendChild(script);
-      isLoad = true;
-    }
-  }, []);
-
   return (
-    props.twitterUsers.length > 0 && (
+    props.images.length > 0 && (
       <TimelineContainer>
         <TimelineRow>
-          {props.twitterUsers.map((user) => {
+          {props.images.map((image, index) => {
             return (
-              <TwitterTimelineContainer key={user.twitterId}>
-                <p>{user.name}</p>
-                <TwitterTimeline userName={user.twitterId}></TwitterTimeline>
-              </TwitterTimelineContainer>
+              <ImageContainer key={index}>
+                <p>{image.name}</p>
+                <img src={props.storage}></img>
+              </ImageContainer>
             );
           })}
         </TimelineRow>
@@ -56,10 +44,13 @@ const TimelineContainer = styled.div`
 
 const TimelineRow = styled.div`
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
 `;
 
-const TwitterTimelineContainer = styled.div`
+const ImageContainer = styled.div`
   padding: 16px;
+  width: 400px;
 `;
 
 export default Timeline;

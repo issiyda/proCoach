@@ -2,32 +2,21 @@
 import { TwitterUser } from '@/types/firebase';
 
 // firebase
+import { getDownloadURL, ref, getStorage } from 'firebase/storage';
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import {
-  getFirestore,
-  addDoc,
-  doc,
-  getDocs,
-  collection,
-} from 'firebase/firestore';
+import { getFirestore, addDoc, getDocs, collection } from 'firebase/firestore';
 
 export const config = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
 };
 
-let app = {
-  apps: [],
-};
+const app = initializeApp(config);
 
-if (!app.apps.length) {
-  initializeApp(config);
-}
-
-const db = getFirestore();
+const db = getFirestore(app);
 
 // fireStore
 export const writeTwitterUser = async (requestData: TwitterUser) => {
@@ -37,8 +26,20 @@ export const writeTwitterUser = async (requestData: TwitterUser) => {
   });
 };
 
+export const getFireStoreData = async (path: string) => {
+  return await getDocs(collection(db, path));
+};
+
 export const getTwitterUser = async () => {
   return await getDocs(collection(db, 'twitter'));
+};
+
+// storage
+export const getStorageData = async (path: string) => {
+  const app = initializeApp(config);
+  const storageRef = await getStorage(app, path);
+  const data = await getDownloadURL(ref(storageRef, '/Bロール.png'));
+  return data;
 };
 
 // auth周り
